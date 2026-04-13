@@ -294,4 +294,33 @@ public class IncidentService {
 
         return count;
     }
+    /**
+     * deleteIncident — permanently removes an incident from the database by its ID.
+     * Used by the admin dashboard when a counselor deletes a report.
+     *
+     * @param id the incident ID to delete
+     * @return true if the delete succeeded, false otherwise
+     */
+    public boolean deleteIncident(int id) {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        boolean success = false;
+
+        try {
+            conn = DBConfig.getConnection();
+            String sql = "DELETE FROM incidents WHERE id = ?";
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            success = (rowsAffected > 0);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+        }
+
+        return success;
+    }
 }

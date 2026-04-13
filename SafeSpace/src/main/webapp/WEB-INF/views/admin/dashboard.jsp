@@ -144,17 +144,9 @@
         color: var(--on-surface);
     }
 
-    .stat-card-value.highlight-amber {
-        color: #e65100;
-    }
-
-    .stat-card-value.highlight-red {
-        color: #c62828;
-    }
-
-    .stat-card-value.highlight-teal {
-        color: var(--primary);
-    }
+    .stat-card-value.highlight-amber { color: #e65100; }
+    .stat-card-value.highlight-red   { color: #c62828; }
+    .stat-card-value.highlight-teal  { color: var(--primary); }
 
     /* ---- Search Box ---- */
     .search-section {
@@ -255,25 +247,10 @@
         font-weight: 600;
     }
 
-    .badge-pending {
-        background: #fff3e0;
-        color: #e65100;
-    }
-
-    .badge-resolved {
-        background: var(--primary-container);
-        color: var(--on-primary-container);
-    }
-
-    .badge-in-review {
-        background: #e3f2fd;
-        color: #1565c0;
-    }
-
-    .badge-critical {
-        background: #fce4ec;
-        color: #c62828;
-    }
+    .badge-pending   { background: #fff3e0; color: #e65100; }
+    .badge-resolved  { background: var(--primary-container); color: var(--on-primary-container); }
+    .badge-in-review { background: #e3f2fd; color: #1565c0; }
+    .badge-critical  { background: #fce4ec; color: #c62828; }
 
     /* ---- View Details Button ---- */
     .btn-view-details {
@@ -292,6 +269,7 @@
     .btn-view-details:hover {
         background: var(--primary-container);
     }
+
     /* ---- Status Dropdown ---- */
     .status-form {
         display: flex;
@@ -334,13 +312,105 @@
         transform: translateY(-1px);
     }
 
+    /* ---- Delete Button ---- */
+    .btn-delete {
+        padding: 6px 14px;
+        border-radius: 8px;
+        background: #fce4ec;
+        color: #c62828;
+        font-family: 'Public Sans', sans-serif;
+        font-weight: 600;
+        font-size: 0.8rem;
+        border: 1.5px solid #ef9a9a;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    .btn-delete:hover {
+        background: #c62828;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    /* ---- Confirm Delete Modal ---- */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    .modal-box {
+        background: var(--surface-lowest);
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    }
+
+    .modal-box h3 {
+        font-size: 1.1rem;
+        color: var(--on-surface);
+        margin-bottom: 10px;
+    }
+
+    .modal-box p {
+        font-size: 0.875rem;
+        color: var(--on-surface-muted);
+        margin-bottom: 24px;
+        line-height: 1.6;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .btn-modal-cancel {
+        padding: 10px 24px;
+        border-radius: 9999px;
+        border: 1.5px solid var(--outline-variant);
+        background: transparent;
+        font-family: 'Public Sans', sans-serif;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: var(--on-surface-muted);
+        cursor: pointer;
+    }
+
+    .btn-modal-confirm {
+        padding: 10px 24px;
+        border-radius: 9999px;
+        background: #c62828;
+        color: #fff;
+        font-family: 'Public Sans', sans-serif;
+        font-weight: 600;
+        font-size: 0.875rem;
+        border: none;
+        cursor: pointer;
+    }
+
     /* ---- Expandable Description ---- */
     .detail-row {
-        display: none;
+        display: none !important;
     }
 
     .detail-row.visible {
-        display: table-row;
+        display: table-row !important;
+    }
+
+    .detail-row td {
+        padding: 0 20px 16px 20px;
     }
 
     .detail-content {
@@ -350,6 +420,7 @@
         font-size: 0.85rem;
         color: var(--on-surface-muted);
         line-height: 1.7;
+        border-left: 3px solid var(--primary);
     }
 
     /* ---- Empty State ---- */
@@ -377,27 +448,14 @@
 
     /* ---- Responsive ---- */
     @media (max-width: 1024px) {
-        .stat-cards {
-            grid-template-columns: repeat(2, 1fr);
-        }
+        .stat-cards { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width: 768px) {
-        .stat-cards {
-            grid-template-columns: 1fr;
-        }
-
-        .admin-header {
-            flex-direction: column;
-        }
-
-        .reports-table-container {
-            overflow-x: auto;
-        }
-
-        .reports-table {
-            min-width: 700px;
-        }
+        .stat-cards      { grid-template-columns: 1fr; }
+        .admin-header    { flex-direction: column; }
+        .reports-table-container { overflow-x: auto; }
+        .reports-table   { min-width: 700px; }
     }
 </style>
 
@@ -481,7 +539,6 @@
                 <tbody>
                     <% for (IncidentModel inc : allIncidents) { %>
                         <%
-                            // Determine the CSS class for the status badge
                             String status = inc.getStatus();
                             String badgeClass = "badge-pending";
                             String displayStatus = "Pending";
@@ -503,30 +560,37 @@
                             <td><%= inc.getSubmittedAt() %></td>
                             <td><span class="badge <%= badgeClass %>"><%= displayStatus %></span></td>
                             <td>
-                            <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-start;">
+                                <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-start;">
 
-                                <!-- View Details toggle (unchanged) -->
-                                <button class="btn-view-details" onclick="toggleDetail(<%= inc.getId() %>)">
-                                    View Details
-                                </button>
+                                    <!-- View Details toggle -->
+                                    <button class="btn-view-details" onclick="toggleDetail(<%= inc.getId() %>)">
+                                        View Details
+                                    </button>
 
-                                <!-- Status change dropdown form -->
-                                <form class="status-form"
-                                      action="${pageContext.request.contextPath}/admin/updateStatus"
-                                      method="post">
-                                    <input type="hidden" name="incidentId" value="<%= inc.getId() %>">
-                                    <select class="status-select" name="newStatus">
-                                        <option value="PENDING"   <%= "PENDING".equals(inc.getStatus())   ? "selected" : "" %>>Pending</option>
-                                        <option value="IN_REVIEW" <%= "IN_REVIEW".equals(inc.getStatus()) ? "selected" : "" %>>In Review</option>
-                                        <option value="RESOLVED"  <%= "RESOLVED".equals(inc.getStatus())  ? "selected" : "" %>>Resolved</option>
-                                        <option value="CRITICAL"  <%= "CRITICAL".equals(inc.getStatus())  ? "selected" : "" %>>Critical</option>
-                                    </select>
-                                    <button type="submit" class="btn-update-status">Update</button>
-                                </form>
+                                    <!-- Status change dropdown -->
+                                    <form class="status-form"
+                                          action="${pageContext.request.contextPath}/admin/updateStatus"
+                                          method="post">
+                                        <input type="hidden" name="incidentId" value="<%= inc.getId() %>">
+                                        <select class="status-select" name="newStatus">
+                                            <option value="PENDING"   <%= "PENDING".equals(inc.getStatus())   ? "selected" : "" %>>Pending</option>
+                                            <option value="IN_REVIEW" <%= "IN_REVIEW".equals(inc.getStatus()) ? "selected" : "" %>>In Review</option>
+                                            <option value="RESOLVED"  <%= "RESOLVED".equals(inc.getStatus())  ? "selected" : "" %>>Resolved</option>
+                                            <option value="CRITICAL"  <%= "CRITICAL".equals(inc.getStatus())  ? "selected" : "" %>>Critical</option>
+                                        </select>
+                                        <button type="submit" class="btn-update-status">Update</button>
+                                    </form>
 
-                            </div>
-                        </td>
+                                    <!-- Delete button -->
+                                    <button class="btn-delete"
+                                            onclick="openDeleteModal(<%= inc.getId() %>)">
+                                        Delete Report
+                                    </button>
+
+                                </div>
+                            </td>
                         </tr>
+
                         <!-- Hidden expandable detail row -->
                         <tr class="detail-row" id="detail-<%= inc.getId() %>">
                             <td colspan="5">
@@ -550,31 +614,38 @@
 
 </div>
 
-<!-- Client-side JavaScript for search and toggle -->
+<!-- Confirm Delete Modal -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+        <h3>Delete Report?</h3>
+        <p>This will permanently remove the report from the system. This action cannot be undone.</p>
+        <div class="modal-actions">
+            <button class="btn-modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+            <form id="deleteForm"
+                  action="${pageContext.request.contextPath}/admin/deleteIncident"
+                  method="post">
+                <input type="hidden" name="incidentId" id="deleteIncidentId">
+                <button type="submit" class="btn-modal-confirm">Yes, Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
 <script>
-    /**
-     * filterTable — filters the reports table rows based on the search input.
-     * Checks each visible row's text content against the search query.
-     */
     function filterTable() {
         var input = document.getElementById('searchInput');
         var filter = input.value.toLowerCase();
         var table = document.getElementById('reportsTable');
-
-        if (!table) return; // No table if no incidents
-
+        if (!table) return;
         var rows = table.querySelectorAll('tbody tr.report-row');
-
         for (var i = 0; i < rows.length; i++) {
             var text = rows[i].textContent.toLowerCase();
             var detailRow = rows[i].nextElementSibling;
-
             if (text.indexOf(filter) > -1) {
                 rows[i].style.display = '';
-                // Keep the detail row hidden unless explicitly expanded
             } else {
                 rows[i].style.display = 'none';
-                // Also hide corresponding detail row
                 if (detailRow && detailRow.classList.contains('detail-row')) {
                     detailRow.classList.remove('visible');
                 }
@@ -582,17 +653,22 @@
         }
     }
 
-    /**
-     * toggleDetail — shows or hides the description detail row
-     * for a specific incident when the View Details button is clicked.
-     *
-     * @param id the incident ID used to find the detail row
-     */
     function toggleDetail(id) {
         var detailRow = document.getElementById('detail-' + id);
+        var btn = event.target;
         if (detailRow) {
             detailRow.classList.toggle('visible');
+            btn.textContent = detailRow.classList.contains('visible') ? 'Hide Details' : 'View Details';
         }
+    }
+
+    function openDeleteModal(id) {
+        document.getElementById('deleteIncidentId').value = id;
+        document.getElementById('deleteModal').classList.add('active');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.remove('active');
     }
 </script>
 

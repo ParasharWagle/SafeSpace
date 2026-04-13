@@ -5,15 +5,12 @@
                              https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
 
-    <!-- Display name for the application -->
     <display-name>SafeSpace</display-name>
 
-    <!-- Welcome file — redirect root URL to /home servlet -->
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 
-    <!-- Session timeout set to 15 minutes for student anonymity -->
     <session-config>
         <session-timeout>15</session-timeout>
     </session-config>
