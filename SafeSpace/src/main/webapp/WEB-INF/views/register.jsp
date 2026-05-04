@@ -7,356 +7,366 @@
     <meta name="description" content="SafeSpace Registration — Create your secure anonymous reporting account.">
     <title>SafeSpace — Create Account</title>
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
 
     <style>
-        /* ============================================================
-           CSS VARIABLES
-           ============================================================ */
         :root {
-            --primary:              #34666d;
-            --primary-dark:         #275961;
-            --primary-container:    #b8ebf4;
-            --on-primary:           #e7fbff;
-            --on-primary-container: #265960;
+            --primary:              #10b981;
+            --primary-dark:         #059669;
+            --primary-darker:       #047857;
+            --primary-light:        #34d399;
+            --primary-container:    #d1fae5;
+            --primary-container-2:  #ecfdf5;
+            --on-primary:           #ffffff;
+            --on-primary-container: #065f46;
+            --accent-deep:          #0f3d36;
             --background:           #f8fafa;
-            --surface-low:          #f0f4f5;
+            --surface-low:          #f1f5f9;
             --surface-lowest:       #ffffff;
-            --surface-high:         #e1eaeb;
-            --on-surface:           #2a3435;
-            --on-surface-muted:     #566162;
-            --on-surface-hint:      #727d7e;
-            --error-container:      #fe8983;
-            --outline-variant:      #a9b4b5;
+            --surface-high:         #e2e8f0;
+            --on-surface:           #0f172a;
+            --on-surface-muted:     #475569;
+            --on-surface-hint:      #94a3b8;
+            --outline-variant:      #cbd5e1;
+            --accent-red-fg:        #ef4444;
+            --accent-red-bg:        #fee2e2;
         }
-
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
+        html, body { height: 100%; }
         body {
             font-family: 'Public Sans', sans-serif;
-            font-weight: 400;
             color: var(--on-surface);
-            background: var(--surface-lowest);
+            background: var(--background);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
         }
-
-        h1, h2, h3, h4 { font-family: 'Manrope', sans-serif; font-weight: 700; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; line-height: 1.2; letter-spacing: -0.01em; }
         a { text-decoration: none; color: inherit; }
 
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            vertical-align: middle;
-        }
-
-        /* ============================================================
-           SPLIT LAYOUT
-           ============================================================ */
-        .register-wrapper {
-            display: flex;
+        .auth-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
             min-height: 100vh;
         }
 
-        /* ---- LEFT PANEL (45%) ---- */
-        .register-left {
-            width: 45%;
-            background: linear-gradient(160deg, #2c5a61 0%, #3a7a82 50%, #2c5a61 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 60px 40px;
-            position: relative;
-            overflow: hidden;
+        /* ---- LEFT: brand panel ---- */
+        .auth-brand {
+            position: relative; overflow: hidden;
+            background: linear-gradient(135deg, #0a2e2a 0%, #0f3d36 55%, #134e47 100%);
+            color: #fff;
+            display: flex; flex-direction: column;
+            padding: 48px;
         }
-
-        .register-left::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at 30% 20%, rgba(184,235,244,0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 70% 80%, rgba(184,235,244,0.06) 0%, transparent 50%);
+        .auth-brand::before {
+            content: ''; position: absolute; inset: 0;
+            background:
+                radial-gradient(circle at 20% 10%, rgba(16,185,129,0.25) 0%, transparent 45%),
+                radial-gradient(circle at 80% 90%, rgba(52,211,153,0.15) 0%, transparent 50%);
             pointer-events: none;
         }
-
-        .left-features {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            max-width: 340px;
+        .auth-brand-logo {
+            position: relative; z-index: 2;
+            display: flex; align-items: center; gap: 10px;
+            font-family: 'Manrope', sans-serif;
+            font-weight: 800; font-size: 1.3rem;
         }
-
-        .feature-card {
-            background: rgba(255,255,255,0.08);
-            backdrop-filter: blur(12px);
-            border-radius: 16px;
-            padding: 24px;
-            display: flex;
-            align-items: flex-start;
-            gap: 16px;
-            transition: transform 0.3s ease, background 0.3s ease;
+        .auth-brand-logo .logo-chip {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-darker) 100%);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(16,185,129,0.35);
         }
-
-        .feature-card:hover {
-            transform: translateX(6px);
-            background: rgba(255,255,255,0.12);
+        .auth-brand-logo .logo-chip .material-symbols-outlined {
+            font-size: 20px; color: #fff;
+            font-variation-settings: 'FILL' 1;
         }
-
-        .feature-card-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: rgba(184,235,244,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .auth-brand-content {
+            position: relative; z-index: 2;
+            margin-top: auto;
+            max-width: 480px;
+        }
+        .auth-brand-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            background: rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.12);
+            backdrop-filter: blur(10px);
+            font-size: 0.78rem; font-weight: 500;
+            margin-bottom: 24px;
+        }
+        .auth-brand-badge .badge-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--primary);
+        }
+        .auth-brand h1 {
+            font-size: clamp(2rem, 3.6vw, 2.8rem);
+            font-weight: 800;
+            margin-bottom: 18px;
+        }
+        .auth-brand h1 .highlight { color: var(--primary-light); }
+        .auth-brand p {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.78);
+            line-height: 1.7;
+            margin-bottom: 32px;
+            max-width: 420px;
+        }
+        .benefits-list {
+            list-style: none;
+            margin-bottom: 32px;
+        }
+        .benefits-list li {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 10px 0;
+            font-size: 0.92rem;
+            color: rgba(255,255,255,0.85);
+        }
+        .benefits-list li .check-icon {
+            width: 22px; height: 22px;
+            border-radius: 6px;
+            background: rgba(16,185,129,0.2);
+            color: var(--primary-light);
+            display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
         }
-
-        .feature-card-icon .material-symbols-outlined {
-            font-size: 24px;
-            color: var(--primary-container);
+        .benefits-list li .check-icon .material-symbols-outlined {
+            font-size: 14px;
+            font-variation-settings: 'FILL' 1, 'wght' 700;
         }
 
-        .feature-card h3 {
-            font-size: 1rem;
-            color: var(--on-primary);
-            margin-bottom: 4px;
-        }
-
-        .feature-card p {
-            font-size: 0.82rem;
-            color: rgba(231,251,255,0.6);
-            line-height: 1.6;
-        }
-
-        /* ---- RIGHT PANEL (55%) ---- */
-        .register-right {
-            width: 55%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 48px;
+        /* ---- RIGHT: form panel ---- */
+        .auth-form-panel {
+            display: flex; align-items: center; justify-content: center;
+            padding: 48px 40px;
             background: var(--surface-lowest);
         }
-
-        .register-form-container {
+        .auth-form-wrap {
             width: 100%;
-            max-width: 440px;
-            animation: fadeIn 0.5s ease;
+            max-width: 480px;
         }
-
-        .register-form-container h1 {
-            font-size: 1.8rem;
+        .auth-form-header { margin-bottom: 28px; }
+        .auth-form-header h2 {
+            font-size: 1.9rem;
+            font-weight: 800;
             color: var(--on-surface);
             margin-bottom: 8px;
         }
-
-        .register-form-subtitle {
-            font-size: 0.9rem;
+        .auth-form-header p {
+            font-size: 0.95rem;
             color: var(--on-surface-muted);
-            margin-bottom: 32px;
         }
 
-        /* ---- FORM INPUTS ---- */
-        .form-group { margin-bottom: 18px; }
-
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .form-group { margin-bottom: 16px; }
         .form-label {
             display: block;
-            font-weight: 500;
-            font-size: 0.85rem;
+            font-weight: 500; font-size: 0.875rem;
             color: var(--on-surface);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
-
+        .input-with-icon { position: relative; }
+        .input-with-icon .material-symbols-outlined {
+            position: absolute;
+            left: 14px; top: 50%; transform: translateY(-50%);
+            font-size: 20px;
+            color: var(--on-surface-hint);
+            pointer-events: none;
+        }
         .form-input {
             width: 100%;
-            padding: 13px 16px;
+            padding: 12px 16px 12px 44px;
             border-radius: 10px;
             border: 1.5px solid var(--outline-variant);
             background: var(--surface-lowest);
             font-family: 'Public Sans', sans-serif;
-            font-size: 0.9rem;
+            font-size: 0.92rem;
             color: var(--on-surface);
             outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: all 0.2s ease;
         }
-
         .form-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(52,102,109,0.12);
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
         }
-
         .form-input::placeholder { color: var(--on-surface-hint); }
 
-        .form-hint {
-            font-size: 0.78rem;
-            color: var(--on-surface-hint);
-            margin-top: 4px;
-        }
-
-        /* ---- SUBMIT BUTTON ---- */
-        .btn-register {
-            width: 100%;
-            padding: 14px;
-            border-radius: 9999px;
-            background: var(--primary);
-            color: var(--on-primary);
-            font-family: 'Public Sans', sans-serif;
-            font-weight: 600;
-            font-size: 1rem;
+        .toggle-password {
+            position: absolute;
+            right: 14px; top: 50%; transform: translateY(-50%);
+            background: transparent;
             border: none;
             cursor: pointer;
-            margin-top: 8px;
-            transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+            color: var(--on-surface-hint);
+            padding: 4px;
+            display: flex;
+        }
+        .toggle-password:hover { color: var(--primary); }
+
+        .password-hint {
+            font-size: 0.75rem;
+            color: var(--on-surface-hint);
+            margin-top: 6px;
         }
 
-        .btn-register:hover {
+        .btn-primary {
+            width: 100%;
+            padding: 13px 24px;
+            margin-top: 6px;
+            border-radius: 10px;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 600; font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(16,185,129,0.3);
+            font-family: 'Public Sans', sans-serif;
+        }
+        .btn-primary:hover {
             background: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(52,102,109,0.25);
+            box-shadow: 0 8px 22px rgba(16,185,129,0.4);
         }
 
-        /* ---- LINKS & NOTES ---- */
-        .login-link {
+        .terms-agree {
+            display: flex; align-items: flex-start; gap: 10px;
+            margin: 18px 0 8px;
+            font-size: 0.82rem;
+            color: var(--on-surface-muted);
+            line-height: 1.5;
+        }
+        .terms-agree input[type="checkbox"] {
+            width: 16px; height: 16px;
+            margin-top: 2px;
+            accent-color: var(--primary);
+            flex-shrink: 0;
+        }
+        .terms-agree a { color: var(--primary); font-weight: 600; }
+        .terms-agree a:hover { text-decoration: underline; }
+
+        .auth-footer {
             text-align: center;
             margin-top: 24px;
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             color: var(--on-surface-muted);
         }
-
-        .login-link a {
+        .auth-footer a {
             color: var(--primary);
             font-weight: 600;
-            transition: color 0.2s ease;
         }
+        .auth-footer a:hover { text-decoration: underline; }
 
-        .login-link a:hover { color: var(--primary-dark); }
-
-        .privacy-note {
-            text-align: center;
-            margin-top: 16px;
-            font-size: 0.78rem;
-            color: var(--on-surface-hint);
-        }
-
-        .privacy-note a {
-            color: var(--primary);
-            font-weight: 500;
-        }
-
-        /* ---- ALERTS ---- */
-        .alert {
-            padding: 14px 18px;
-            border-radius: 12px;
+        .back-home-link {
+            position: absolute;
+            top: 24px; left: 24px;
+            z-index: 3;
             font-size: 0.85rem;
-            font-weight: 500;
+            color: rgba(255,255,255,0.75);
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+        .back-home-link:hover { color: #fff; }
+        .back-home-link .material-symbols-outlined { font-size: 18px; }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.85rem;
             margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            display: flex; align-items: center; gap: 10px;
         }
+        .alert-error { background: var(--accent-red-bg); color: #991b1b; }
+        .alert .material-symbols-outlined { font-size: 20px; flex-shrink: 0; }
 
-        .alert-error {
-            background: #fce4ec;
-            color: #c62828;
-        }
-
-        /* ---- EMERGENCY EXIT ---- */
         .emergency-exit {
             position: fixed;
-            bottom: 28px;
-            right: 28px;
+            bottom: 24px; right: 24px;
             z-index: 9999;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
+            padding: 10px 20px;
             border-radius: 9999px;
-            background: var(--error-container);
+            background: var(--accent-red-fg);
             color: #fff;
-            font-family: 'Public Sans', sans-serif;
             font-weight: 600;
-            font-size: 0.875rem;
-            box-shadow: 0 4px 20px rgba(254,137,131,0.4);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-size: 0.82rem;
+            display: inline-flex; align-items: center; gap: 6px;
+            box-shadow: 0 4px 20px rgba(239,68,68,0.4);
+            transition: all 0.2s ease;
         }
+        .emergency-exit:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(239,68,68,0.55); }
+        .emergency-exit .material-symbols-outlined { font-size: 18px; }
 
-        .emergency-exit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 28px rgba(254,137,131,0.55);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 768px) {
-            .register-wrapper { flex-direction: column; }
-            .register-left { width: 100%; padding: 40px 24px; }
-            .register-right { width: 100%; padding: 32px 24px; }
+        @media (max-width: 960px) {
+            .auth-layout { grid-template-columns: 1fr; }
+            .auth-brand { min-height: 220px; padding: 48px 32px 32px; }
+            .auth-brand-content { margin-top: 16px; }
+            .benefits-list { display: none; }
+            .auth-form-panel { padding: 40px 24px; }
+            .form-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-<div class="register-wrapper">
-    <!-- ============================================================
-         LEFT PANEL — Feature Cards
-         ============================================================ -->
-    <div class="register-left">
-        <div class="left-features">
-            <!-- Feature 1: Privacy -->
-            <div class="feature-card">
-                <div class="feature-card-icon">
-                    <span class="material-symbols-outlined">lock</span>
-                </div>
-                <div>
-                    <h3>End-to-End Privacy</h3>
-                    <p>Your reports are encrypted and anonymised before they reach any counselor.</p>
-                </div>
-            </div>
+<div class="auth-layout">
 
-            <!-- Feature 2: Access -->
-            <div class="feature-card">
-                <div class="feature-card-icon">
-                    <span class="material-symbols-outlined">bolt</span>
-                </div>
-                <div>
-                    <h3>Instant Access</h3>
-                    <p>Create your account in seconds and start submitting reports immediately.</p>
-                </div>
-            </div>
-
-            <!-- Feature 3: Security -->
-            <div class="feature-card">
-                <div class="feature-card-icon">
-                    <span class="material-symbols-outlined">shield</span>
-                </div>
-                <div>
-                    <h3>Secure Campus</h3>
-                    <p>Help build a safer campus community through anonymous incident reporting.</p>
-                </div>
-            </div>
+    <!-- LEFT: brand -->
+    <section class="auth-brand">
+        <a href="${pageContext.request.contextPath}/home" class="back-home-link">
+            <span class="material-symbols-outlined">arrow_back</span> Back to home
+        </a>
+        <div class="auth-brand-logo">
+            <div class="logo-chip"><span class="material-symbols-outlined">shield_person</span></div>
+            SafeSpace
         </div>
-    </div>
 
-    <!-- ============================================================
-         RIGHT PANEL — Registration Form
-         ============================================================ -->
-    <div class="register-right">
-        <div class="register-form-container">
-            <h1>Create your account</h1>
-            <p class="register-form-subtitle">Join SafeSpace and start reporting anonymously</p>
+        <div class="auth-brand-content">
+            <div class="auth-brand-badge">
+                <span class="badge-dot"></span>
+                100% Anonymous &amp; Encrypted
+            </div>
+            <h1>Join <span class="highlight">SafeSpace</span> &mdash; your voice matters.</h1>
+            <p>Create an account to access anonymous reporting, on-demand counseling,
+               and a safer school environment for everyone.</p>
 
-            <%-- Error message alert --%>
+            <ul class="benefits-list">
+                <li>
+                    <span class="check-icon"><span class="material-symbols-outlined">check</span></span>
+                    End-to-end encrypted reports &mdash; identity never revealed
+                </li>
+                <li>
+                    <span class="check-icon"><span class="material-symbols-outlined">check</span></span>
+                    Attach photos, screenshots, or links as evidence
+                </li>
+                <li>
+                    <span class="check-icon"><span class="material-symbols-outlined">check</span></span>
+                    Direct access to trained counselors &mdash; 24/7
+                </li>
+                <li>
+                    <span class="check-icon"><span class="material-symbols-outlined">check</span></span>
+                    FERPA compliant. SOC 2 certified infrastructure.
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- RIGHT: form -->
+    <section class="auth-form-panel">
+        <div class="auth-form-wrap">
+            <div class="auth-form-header">
+                <h2>Create your account</h2>
+                <p>It takes less than a minute. Your identity stays anonymous.</p>
+            </div>
+
             <% if (request.getAttribute("errorMessage") != null) { %>
                 <div class="alert alert-error">
                     <span class="material-symbols-outlined">error</span>
@@ -364,70 +374,91 @@
                 </div>
             <% } %>
 
-            <!-- Registration form -->
+            <%-- ACTION and FIELD NAMES preserved exactly as RegisterServlet expects --%>
             <form action="${pageContext.request.contextPath}/register" method="post" id="registerForm">
 
-                <!-- Full Name -->
                 <div class="form-group">
                     <label class="form-label" for="fullName">Full Name</label>
-                    <input type="text" class="form-input" id="fullName" name="fullName"
-                           placeholder="Enter your full name" required>
+                    <div class="input-with-icon">
+                        <span class="material-symbols-outlined">badge</span>
+                        <input type="text" class="form-input" id="fullName" name="fullName"
+                               placeholder="Your full name" autocomplete="name" required>
+                    </div>
                 </div>
 
-                <!-- Username -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="studentId">Student ID</label>
+                        <div class="input-with-icon">
+                            <span class="material-symbols-outlined">tag</span>
+                            <input type="text" class="form-input" id="studentId" name="studentId"
+                                   placeholder="e.g. IC12345" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="phone">Phone</label>
+                        <div class="input-with-icon">
+                            <span class="material-symbols-outlined">call</span>
+                            <input type="tel" class="form-input" id="phone" name="phone"
+                                   placeholder="98XXXXXXXX" autocomplete="tel" required>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label class="form-label" for="username">Username</label>
-                    <input type="text" class="form-input" id="username" name="username"
-                           placeholder="Choose a username" required>
+                    <div class="input-with-icon">
+                        <span class="material-symbols-outlined">person</span>
+                        <input type="text" class="form-input" id="username" name="username"
+                               placeholder="Choose a username" autocomplete="username" required>
+                    </div>
                 </div>
 
-                <!-- Password -->
                 <div class="form-group">
                     <label class="form-label" for="password">Password</label>
-                    <input type="password" class="form-input" id="password" name="password"
-                           placeholder="Create a password" required>
+                    <div class="input-with-icon">
+                        <span class="material-symbols-outlined">lock</span>
+                        <input type="password" class="form-input" id="password" name="password"
+                               placeholder="Create a strong password" autocomplete="new-password" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword()">
+                            <span class="material-symbols-outlined" id="toggleIcon">visibility</span>
+                        </button>
+                    </div>
+                    <p class="password-hint">Use 8+ characters with a mix of letters, numbers &amp; symbols.</p>
                 </div>
 
-                <!-- Student ID -->
-                <div class="form-group">
-                    <label class="form-label" for="studentId">Student ID</label>
-                    <input type="text" class="form-input" id="studentId" name="studentId"
-                           placeholder="e.g. STU-2024-0042" required>
-                    <div class="form-hint">Must be the official ID issued by your registrar</div>
-                </div>
+                <label class="terms-agree">
+                    <input type="checkbox" required>
+                    <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+                          I understand my reports remain anonymous.</span>
+                </label>
 
-                <!-- Phone Number -->
-                <div class="form-group">
-                    <label class="form-label" for="phone">Phone Number</label>
-                    <input type="tel" class="form-input" id="phone" name="phone"
-                           placeholder="Enter your phone number" required>
-                </div>
-
-                <!-- Create Account button -->
-                <button type="submit" class="btn-register" id="register-submit-btn">Create Account</button>
+                <button type="submit" class="btn-primary">
+                    Create My Account
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
             </form>
 
-            <!-- Login link -->
-            <div class="login-link">
-                Already have an account? <a href="${pageContext.request.contextPath}/login">Log in</a>
-            </div>
-
-            <!-- Privacy note -->
-            <div class="privacy-note">
-                By clicking Create Account you agree to our <a href="#">Terms of Service</a>
+            <div class="auth-footer">
+                Already have an account?
+                <a href="${pageContext.request.contextPath}/login">Sign in instead</a>
             </div>
         </div>
-    </div>
+    </section>
 </div>
 
-<!-- Emergency exit button -->
-<a href="https://www.google.com"
-   class="emergency-exit"
-   id="quick-exit-btn"
-   onclick="window.open('https://www.google.com','_self'); return false;">
-    <span class="material-symbols-outlined">close</span>
-    Quick Exit
+<a href="https://www.google.com" class="emergency-exit">
+    <span class="material-symbols-outlined">exit_to_app</span>
+    Exit
 </a>
 
+<script>
+    function togglePassword() {
+        var input = document.getElementById('password');
+        var icon  = document.getElementById('toggleIcon');
+        if (input.type === 'password') { input.type = 'text'; icon.textContent = 'visibility_off'; }
+        else                           { input.type = 'password'; icon.textContent = 'visibility'; }
+    }
+</script>
 </body>
 </html>

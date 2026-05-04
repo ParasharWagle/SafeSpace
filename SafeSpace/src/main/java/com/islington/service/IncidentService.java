@@ -294,12 +294,18 @@ public class IncidentService {
 
         return count;
     }
+
     /**
-     * deleteIncident — permanently removes an incident from the database by its ID.
-     * Used by the admin dashboard when a counselor deletes a report.
+     * deleteIncident — removes an incident record permanently by its ID.
+     * The 'evidence' table has ON DELETE CASCADE, so any attached files/links
+     * in the database will be cleaned up automatically.
+     *
+     * Note: the physical uploaded files on disk are NOT removed here. For a
+     * course-level implementation this keeps behaviour simple; in production
+     * you would also purge the files under safespace_uploads/.
      *
      * @param id the incident ID to delete
-     * @return true if the delete succeeded, false otherwise
+     * @return true if a row was deleted, false otherwise
      */
     public boolean deleteIncident(int id) {
         Connection conn = null;
@@ -307,16 +313,24 @@ public class IncidentService {
         boolean success = false;
 
         try {
+            // Step 1 & 2: Load driver and get connection via DBConfig
             conn = DBConfig.getConnection();
+
+            // Step 3: Prepare the DELETE statement with parameterised id
             String sql = "DELETE FROM incidents WHERE id = ?";
             stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, id);
+            stmt.setInt(1, id); // Bind the incident ID
+
+            // Step 4: Execute the delete and check rows affected
             int rowsAffected = stmt.executeUpdate();
+
+            // Step 5: Success if at least one row deleted
             success = (rowsAffected > 0);
 
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
+            // Step 6: Close all resources in reverse order
             try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
             try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
         }

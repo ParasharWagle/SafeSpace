@@ -1,109 +1,156 @@
 package com.islington.controller;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Collection;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
+import com.islington.config.DBConfig;
+import com.islington.config.FileUploadUtil;
+import com.islington.model.EvidenceModel;
 import com.islington.model.IncidentModel;
+import com.islington.service.EvidenceService;
 import com.islington.service.IncidentService;
 
-/**
- * SubmitReportServlet — handles anonymous incident report submission.
- * Mapped to /student/report — protected by AuthFilter (STUDENT role only).
- * Validates form input and creates a new incident record in the database.
- */
 @WebServlet("/student/report")
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024,
+    maxFileSize       = 25L * 1024L * 1024L,
+    maxRequestSize    = 100L * 1024L * 1024L
+)
 public class SubmitReportServlet extends HttpServlet {
 
-    /**
-     * doGet — displays the incident report submission form.
-     * Simply forwards to the report.jsp view.
-     *
-     * @param req  the HTTP request object
-     * @param resp the HTTP response object
-     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
-        // Forward to the report form view — JSP handles presentation
         req.getRequestDispatcher("/WEB-INF/views/student/report.jsp").forward(req, resp);
     }
 
-    /**
-     * doPost — processes the submitted incident report.
-     * Validates that category and description are not empty,
-     * determines severity from urgency radio selection,
-     * creates an IncidentModel and saves it via IncidentService.
-     *
-     * @param req  the HTTP request object containing form data
-     * @param resp the HTTP response object
-     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // Retrieve form inputs
         String category    = req.getParameter("category");
         String description = req.getParameter("description");
         String urgency     = req.getParameter("urgency");
 
-        // Input validation — category and description are required
         if (category == null    || category.trim().isEmpty() ||
             description == null || description.trim().isEmpty()) {
-
-            // Set error message and forward back to report form
             req.setAttribute("errorMessage", "Please select a category and provide a description.");
             req.getRequestDispatcher("/WEB-INF/views/student/report.jsp").forward(req, resp);
             return;
         }
-
-        // Trim whitespace from inputs
         category    = category.trim();
         description = description.trim();
-
-        // Validate description length does not exceed 2000 characters
         if (description.length() > 2000) {
             req.setAttribute("errorMessage", "Description must not exceed 2000 characters.");
             req.getRequestDispatcher("/WEB-INF/views/student/report.jsp").forward(req, resp);
             return;
         }
 
-        // Retrieve the anonymous token from the session
         HttpSession session = req.getSession(false);
         String token = (String) session.getAttribute("token");
+        String severity = "high".equals(urgency) ? "HIGH" : "LOW";
 
-        // Determine severity level based on urgency radio selection
-        String severity = "LOW"; // Default to standard priority
-        if ("high".equals(urgency)) {
-            severity = "HIGH"; // High priority selected
-        }
-
-        // Create an IncidentModel and populate it with form data
         IncidentModel incident = new IncidentModel();
         incident.setAnonymousToken(token);
         incident.setCategory(category);
         incident.setDescription(description);
         incident.setSeverity(severity);
 
-        // Use IncidentService to save the incident to the database
         IncidentService incidentService = new IncidentService();
         boolean success = incidentService.createIncident(incident);
 
-        if (success) {
-            // Report submitted successfully — redirect to dashboard with success message
-            // Using session attribute since we're doing a redirect (PRG pattern)
-            session.setAttribute("successMessage", "Your anonymous report has been submitted successfully.");
-            resp.sendRedirect(req.getContextPath() + "/student/dashboard");
-        } else {
-            // Insert failed — show error on the form
+        if (!success) {
             req.setAttribute("errorMessage", "Failed to submit your report. Please try again.");
             req.getRequestDispatcher("/WEB-INF/views/student/report.jsp").forward(req, resp);
+            return;
         }
+
+        int newIncidentId = lookupLatestIncidentId(token);
+        int evidenceCount = 0;
+        if (newIncidentId > 0) {
+            evidenceCount += saveUploadedFiles(req, newIncidentId);
+            evidenceCount += saveEvidenceLinks(req, newIncidentId);
+        }
+
+        String msg = "Your anonymous report has been submitted successfully.";
+        if (evidenceCount > 0) {
+            msg += " " + evidenceCount + " piece"
+                 + (evidenceCount == 1 ? "" : "s") + " of evidence attached.";
+        }
+        session.setAttribute("successMessage", msg);
+        resp.sendRedirect(req.getContextPath() + "/student/dashboard");
+    }
+
+    private int lookupLatestIncidentId(String token) {
+        try (Connection conn = DBConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                 "SELECT id FROM incidents WHERE anonymous_token = ? ORDER BY id DESC LIMIT 1")) {
+            stmt.setString(1, token);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getInt("id");
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return -1;
+    }
+
+    private int saveUploadedFiles(HttpServletRequest req, int incidentId) {
+        int savedCount = 0;
+        try {
+            Collection<Part> parts = req.getParts();
+            EvidenceService evidenceService = new EvidenceService();
+            for (Part part : parts) {
+                if (!"evidenceFile".equals(part.getName())) continue;
+                String originalFilename = FileUploadUtil.extractFilename(part);
+                if (originalFilename == null || originalFilename.trim().isEmpty()) continue;
+                if (part.getSize() <= 0) continue;
+                if (part.getSize() > FileUploadUtil.MAX_FILE_SIZE) continue;
+                String mimeType = part.getContentType();
+                if (!FileUploadUtil.isAllowedMimeType(mimeType)) continue;
+                String storedFilename = FileUploadUtil.saveUploadedFile(part, originalFilename);
+                EvidenceModel ev = new EvidenceModel();
+                ev.setIncidentId(incidentId);
+                ev.setEvidenceType("FILE");
+                ev.setStoredFilename(storedFilename);
+                ev.setOriginalFilename(originalFilename);
+                ev.setMimeType(mimeType);
+                ev.setFileSize(part.getSize());
+                ev.setCaption(req.getParameter("evidenceCaption"));
+                if (evidenceService.createEvidence(ev)) savedCount++;
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return savedCount;
+    }
+
+    private int saveEvidenceLinks(HttpServletRequest req, int incidentId) {
+        int savedCount = 0;
+        String raw = req.getParameter("evidenceLinks");
+        if (raw == null || raw.trim().isEmpty()) return 0;
+        EvidenceService evidenceService = new EvidenceService();
+        for (String line : raw.split("\\r?\\n")) {
+            line = line.trim();
+            if (line.isEmpty()) continue;
+            if (!line.toLowerCase().startsWith("http://") &&
+                !line.toLowerCase().startsWith("https://")) continue;
+            if (line.length() > 1000) line = line.substring(0, 1000);
+            EvidenceModel ev = new EvidenceModel();
+            ev.setIncidentId(incidentId);
+            ev.setEvidenceType("LINK");
+            ev.setLinkUrl(line);
+            ev.setCaption(req.getParameter("evidenceCaption"));
+            if (evidenceService.createEvidence(ev)) savedCount++;
+        }
+        return savedCount;
     }
 }

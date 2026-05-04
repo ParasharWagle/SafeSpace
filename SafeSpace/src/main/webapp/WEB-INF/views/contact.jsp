@@ -1,380 +1,287 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<%-- Include the shared header with navbar and CSS design system --%>
+<% request.setAttribute("navMode",   "solid"); %>
+<% request.setAttribute("activeNav", "home"); %>
 <%@ include file="header.jsp" %>
 
 <style>
-    /* ============================================================
-       CONTACT PAGE
-       ============================================================ */
-    .contact-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 60px 24px 80px;
+    .contact-hero {
+        background: linear-gradient(135deg, var(--primary-container-2) 0%, var(--surface-lowest) 100%);
+        padding: 60px 24px 40px;
     }
-
-    .contact-heading {
+    .contact-hero-inner {
+        max-width: 1200px; margin: 0 auto;
         text-align: center;
-        margin-bottom: 52px;
     }
-
-    .contact-heading h1 {
-        font-size: 2.4rem;
-        color: var(--on-surface);
+    .contact-hero .section-eyebrow {
+        display: inline-block;
+        font-size: 0.78rem; font-weight: 700;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
         margin-bottom: 12px;
     }
-
-    .contact-heading p {
-        font-size: 1.05rem;
+    .contact-hero h1 {
+        font-family: 'Manrope', sans-serif;
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 800;
+        margin-bottom: 14px;
+    }
+    .contact-hero p {
+        font-size: 1.02rem;
         color: var(--on-surface-muted);
-        max-width: 520px;
+        max-width: 640px;
         margin: 0 auto;
-        line-height: 1.7;
     }
 
-    /* ---- Two Column Layout ---- */
-    .contact-grid {
-        display: flex;
-        gap: 48px;
-        align-items: flex-start;
+    .contact-wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 60px 24px 100px;
+        display: grid;
+        grid-template-columns: 1fr 1.4fr;
+        gap: 32px;
     }
 
-    /* ---- Left Form Column (60%) ---- */
-    .contact-form-col {
-        flex: 3;
+    /* ---- Left: contact info cards ---- */
+    .contact-info-col {
+        display: flex; flex-direction: column; gap: 14px;
+    }
+    .info-card {
+        background: var(--surface-lowest);
+        border-radius: 16px;
+        padding: 22px 24px;
+        border: 1px solid var(--surface-high);
+        display: flex; gap: 16px; align-items: flex-start;
+        transition: all 0.2s ease;
+    }
+    .info-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(16,185,129,0.08);
+        border-color: var(--primary-container);
+    }
+    .info-icon {
+        width: 44px; height: 44px;
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+    }
+    .info-icon .material-symbols-outlined { font-size: 22px; }
+    .info-card.green  .info-icon { background: var(--accent-green-bg); color: var(--accent-green-fg); }
+    .info-card.blue   .info-icon { background: var(--accent-blue-bg);  color: var(--accent-blue-fg); }
+    .info-card.amber  .info-icon { background: var(--accent-amber-bg); color: var(--accent-amber-fg); }
+    .info-card.red    .info-icon { background: var(--accent-red-bg);   color: var(--accent-red-fg); }
+
+    .info-card h3 {
+        font-size: 0.98rem;
+        font-weight: 700;
+        color: var(--on-surface);
+        margin-bottom: 4px;
+    }
+    .info-card p {
+        font-size: 0.85rem;
+        color: var(--on-surface-muted);
+        margin-bottom: 6px;
+    }
+    .info-card a {
+        display: inline-block;
+        font-size: 0.88rem;
+        color: var(--primary);
+        font-weight: 600;
+    }
+    .info-card a:hover { text-decoration: underline; }
+
+    /* Campus help strip (gradient bottom card) */
+    .campus-help {
+        margin-top: 8px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-darker) 100%);
+        color: #fff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 8px 24px rgba(16,185,129,0.25);
+    }
+    .campus-help h3 { font-size: 1.05rem; margin-bottom: 8px; }
+    .campus-help p { font-size: 0.85rem; opacity: 0.9; line-height: 1.6; margin-bottom: 14px; }
+    .campus-help .helpline {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 8px 16px;
+        border-radius: 9999px;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(10px);
+        font-weight: 700; font-size: 0.9rem;
     }
 
+    /* ---- Right: form card ---- */
     .contact-form-card {
         background: var(--surface-lowest);
         border-radius: 20px;
         padding: 36px;
+        border: 1px solid var(--surface-high);
     }
-
-    .form-group {
-        margin-bottom: 22px;
-    }
-
-    .form-label {
-        display: block;
-        font-weight: 500;
-        font-size: 0.875rem;
+    .contact-form-card h2 {
+        font-size: 1.4rem;
+        font-weight: 800;
         color: var(--on-surface);
         margin-bottom: 6px;
     }
+    .contact-form-card .sub {
+        font-size: 0.92rem;
+        color: var(--on-surface-muted);
+        margin-bottom: 24px;
+    }
 
-    .form-input,
-    .form-select,
-    .form-textarea {
-        width: 100%;
-        padding: 13px 16px;
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .form-actions {
+        margin-top: 8px;
+    }
+    .btn-primary {
+        padding: 13px 28px;
         border-radius: 10px;
-        border: 1.5px solid var(--outline-variant);
-        background: var(--surface-lowest);
-        font-family: 'Public Sans', sans-serif;
-        font-size: 0.9rem;
-        color: var(--on-surface);
-        outline: none;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .form-input:focus,
-    .form-select:focus,
-    .form-textarea:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(52,102,109,0.12);
-    }
-
-    .form-input::placeholder,
-    .form-textarea::placeholder {
-        color: var(--on-surface-hint);
-    }
-
-    .form-select {
-        cursor: pointer;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23727d7e' d='M6 8.825L.35 3.175l.825-.825L6 7.175l4.825-4.825.825.825z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 14px center;
-        padding-right: 36px;
-    }
-
-    .form-textarea {
-        min-height: 150px;
-        resize: vertical;
-        line-height: 1.7;
-    }
-
-    .btn-submit-contact {
-        padding: 13px 32px;
-        border-radius: 9999px;
         background: var(--primary);
-        color: var(--on-primary);
-        font-family: 'Public Sans', sans-serif;
-        font-weight: 600;
-        font-size: 0.95rem;
+        color: #fff;
+        font-weight: 600; font-size: 0.92rem;
         border: none;
         cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+        display: inline-flex; align-items: center; gap: 8px;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 14px rgba(16,185,129,0.3);
     }
-
-    .btn-submit-contact:hover {
+    .btn-primary:hover {
         background: var(--primary-dark);
         transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(52,102,109,0.25);
+        box-shadow: 0 8px 22px rgba(16,185,129,0.4);
     }
 
-    .form-privacy-note {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 20px;
-        font-size: 0.8rem;
-        color: var(--on-surface-hint);
-    }
-
-    .form-privacy-note .material-symbols-outlined {
-        font-size: 18px;
-        color: var(--primary);
-    }
-
-    /* ---- Right Sidebar (40%) ---- */
-    .contact-sidebar {
-        flex: 2;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
-
-    .contact-card {
-        background: var(--surface-lowest);
-        border-radius: 16px;
-        padding: 24px;
-        display: flex;
-        align-items: flex-start;
-        gap: 16px;
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
-
-    .contact-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 24px rgba(0,0,0,0.05);
-    }
-
-    .contact-card-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        background: var(--primary-container);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .contact-card-icon .material-symbols-outlined {
-        font-size: 24px;
-        color: var(--primary);
-    }
-
-    .contact-card-info h3 {
-        font-size: 0.95rem;
-        color: var(--on-surface);
-        margin-bottom: 4px;
-    }
-
-    .contact-card-info p {
-        font-size: 0.85rem;
-        color: var(--on-surface-muted);
-        line-height: 1.5;
-    }
-
-    .contact-card-info .contact-detail {
-        font-weight: 600;
-        color: var(--primary);
-        font-size: 0.9rem;
-        margin-top: 4px;
-    }
-
-    /* ---- Alerts ---- */
-    .alert {
-        padding: 14px 20px;
-        border-radius: 12px;
-        font-size: 0.875rem;
-        font-weight: 500;
-        margin-bottom: 24px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .alert-success {
-        background: var(--primary-container);
-        color: var(--on-primary-container);
-    }
-
-    .alert-error {
-        background: #fce4ec;
-        color: #c62828;
-    }
-
-    /* ---- Responsive ---- */
-    @media (max-width: 768px) {
-        .contact-grid {
-            flex-direction: column;
-        }
-
-        .contact-heading h1 {
-            font-size: 1.8rem;
-        }
-
-        .contact-form-card {
-            padding: 24px;
-        }
+    @media (max-width: 900px) {
+        .contact-wrap { grid-template-columns: 1fr; }
+        .form-row { grid-template-columns: 1fr; }
     }
 </style>
 
-<div class="contact-container">
-
-    <!-- Page heading -->
-    <div class="contact-heading">
-        <h1>We're here to listen.</h1>
-        <p>Whether you need technical help, a referral, or just someone to talk to — we're ready to support you.</p>
+<section class="contact-hero">
+    <div class="contact-hero-inner">
+        <div class="section-eyebrow">Contact Us</div>
+        <h1>We're Here When You Need Us</h1>
+        <p>Reach out for support, share feedback, or ask a question. Your message reaches our
+           trained team directly &mdash; and everything stays confidential.</p>
     </div>
+</section>
 
-    <%-- Success message --%>
-    <% if (request.getAttribute("successMessage") != null) { %>
-        <div class="alert alert-success">
-            <span class="material-symbols-outlined">check_circle</span>
-            <%= request.getAttribute("successMessage") %>
+<div class="contact-wrap">
+
+    <!-- Left: info cards -->
+    <div class="contact-info-col">
+        <div class="info-card green">
+            <div class="info-icon"><span class="material-symbols-outlined">mail</span></div>
+            <div>
+                <h3>Email Support</h3>
+                <p>For non-urgent inquiries &mdash; reply within 24 hours.</p>
+                <a href="mailto:support@safespace.edu.np">support@safespace.edu.np</a>
+            </div>
         </div>
-    <% } %>
-
-    <%-- Error message --%>
-    <% if (request.getAttribute("errorMessage") != null) { %>
-        <div class="alert alert-error">
-            <span class="material-symbols-outlined">error</span>
-            <%= request.getAttribute("errorMessage") %>
+        <div class="info-card blue">
+            <div class="info-icon"><span class="material-symbols-outlined">chat</span></div>
+            <div>
+                <h3>Live Chat</h3>
+                <p>Talk to a counselor instantly during school hours.</p>
+                <a href="#">Start Chat &rarr;</a>
+            </div>
         </div>
-    <% } %>
-
-    <!-- Two column layout -->
-    <div class="contact-grid">
-
-        <!-- Left: Contact Form (60%) -->
-        <div class="contact-form-col">
-            <div class="contact-form-card">
-                <form action="${pageContext.request.contextPath}/contact" method="post" id="contactForm">
-
-                    <!-- Preferred Name -->
-                    <div class="form-group">
-                        <label class="form-label" for="name">Preferred Name</label>
-                        <input type="text" class="form-input" id="name" name="name"
-                               placeholder="How should we address you?" required>
-                    </div>
-
-                    <!-- Email (Optional) -->
-                    <div class="form-group">
-                        <label class="form-label" for="email">Email <span style="color: var(--on-surface-hint); font-weight: 400;">(Optional)</span></label>
-                        <input type="email" class="form-input" id="email" name="email"
-                               placeholder="your.email@example.com">
-                    </div>
-
-                    <!-- Support Category -->
-                    <div class="form-group">
-                        <label class="form-label" for="category">Support Category</label>
-                        <select class="form-select" id="category" name="category">
-                            <option value="" disabled selected>What can we help with?</option>
-                            <option value="Technical Issue">Technical Issue</option>
-                            <option value="Anonymous Reporting Help">Anonymous Reporting Help</option>
-                            <option value="Mental Health Referral">Mental Health Referral</option>
-                            <option value="Policy Clarification">Policy Clarification</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-
-                    <!-- Message -->
-                    <div class="form-group">
-                        <label class="form-label" for="message">Message</label>
-                        <textarea class="form-textarea" id="message" name="message"
-                                  placeholder="Tell us how we can support you..." required></textarea>
-                    </div>
-
-                    <!-- Submit button -->
-                    <button type="submit" class="btn-submit-contact" id="contact-submit-btn">
-                        <span class="material-symbols-outlined">send</span>
-                        Submit Request
-                    </button>
-
-                    <!-- Privacy note -->
-                    <div class="form-privacy-note">
-                        <span class="material-symbols-outlined">lock</span>
-                        Your inquiry can be processed anonymously if no email is provided.
-                    </div>
-                </form>
+        <div class="info-card amber">
+            <div class="info-icon"><span class="material-symbols-outlined">schedule</span></div>
+            <div>
+                <h3>Office Hours</h3>
+                <p>Sun &ndash; Fri &bull; 9:00 AM &ndash; 5:00 PM (NPT)</p>
+                <a href="#">View Calendar &rarr;</a>
+            </div>
+        </div>
+        <div class="info-card red">
+            <div class="info-icon"><span class="material-symbols-outlined">emergency</span></div>
+            <div>
+                <h3>Emergency Line</h3>
+                <p>For urgent safety issues &mdash; available 24/7.</p>
+                <a href="tel:100">Call Nepal Police: 100</a>
             </div>
         </div>
 
-        <!-- Right: Contact Info Sidebar (40%) -->
-        <div class="contact-sidebar">
-
-            <!-- 24/7 Crisis Hotline -->
-            <!-- ✅ CHANGED: number updated to Nepali helpline -->
-            <div class="contact-card">
-                <div class="contact-card-icon">
-                    <span class="material-symbols-outlined">call</span>
-                </div>
-                <div class="contact-card-info">
-                    <h3>24/7 Crisis Hotline</h3>
-                    <p>Speak with a trained crisis counselor anytime.</p>
-                    <div class="contact-detail">1660-01-11116 (Nepali Helpline)</div>
-                </div>
-            </div>
-
-            <!-- Text Support -->
-            <!-- ✅ CHANGED: number updated to NTC SMS -->
-            <div class="contact-card">
-                <div class="contact-card-icon">
-                    <span class="material-symbols-outlined">chat</span>
-                </div>
-                <div class="contact-card-info">
-                    <h3>Text Support</h3>
-                    <p>Prefer texting? Reach our support team by SMS.</p>
-                    <div class="contact-detail">Text HELP to 1600 (NTC)</div>
-                </div>
-            </div>
-
-            <!-- Dean of Students -->
-            <div class="contact-card">
-                <div class="contact-card-icon">
-                    <span class="material-symbols-outlined">person</span>
-                </div>
-                <div class="contact-card-info">
-                    <h3>Dean of Students</h3>
-                    <p>Visit during office hours for in-person support.</p>
-                    <div class="contact-detail">Administration Building Room 204</div>
-                </div>
-            </div>
-
-            <!-- Campus Security -->
-            <!-- ✅ CHANGED: updated to Nepal Police number -->
-            <div class="contact-card">
-                <div class="contact-card-icon">
-                    <span class="material-symbols-outlined">security</span>
-                </div>
-                <div class="contact-card-info">
-                    <h3>Campus Security</h3>
-                    <p>For immediate safety concerns on campus.</p>
-                    <div class="contact-detail">100 (Nepal Police) · Available 24/7</div>
-                </div>
-            </div>
-
+        <div class="campus-help">
+            <h3>On-Campus Crisis Support</h3>
+            <p>Islington College has trained counselors on site. If you need immediate help,
+               walk-ins are welcome at the Student Wellness Office.</p>
+            <span class="helpline">
+                <span class="material-symbols-outlined">phone_in_talk</span>
+                +977 1-5555555
+            </span>
         </div>
     </div>
 
+    <!-- Right: form -->
+    <div class="contact-form-card">
+        <h2>Send us a message</h2>
+        <p class="sub">Whether it's feedback, questions, or concerns &mdash; we read every one.</p>
+
+        <% if (request.getAttribute("successMessage") != null) { %>
+            <div class="alert alert-success">
+                <span class="material-symbols-outlined">check_circle</span>
+                <%= request.getAttribute("successMessage") %>
+            </div>
+        <% } %>
+        <% if (request.getAttribute("errorMessage") != null) { %>
+            <div class="alert alert-error">
+                <span class="material-symbols-outlined">error</span>
+                <%= request.getAttribute("errorMessage") %>
+            </div>
+        <% } %>
+
+        <%-- ACTION and FIELD NAMES preserved exactly as ContactServlet expects --%>
+        <form action="${pageContext.request.contextPath}/contact" method="post" id="contactForm">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="name">Your Name</label>
+                    <input type="text" class="form-input" id="name" name="name"
+                           placeholder="Full name" required
+                           style="padding-left: 16px;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input type="email" class="form-input" id="email" name="email"
+                           placeholder="you@example.com" required
+                           style="padding-left: 16px;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="category">Reason for contact</label>
+                <select class="form-select" id="category" name="category">
+                    <option value="General Inquiry">General Inquiry</option>
+                    <option value="Technical Support">Technical Support</option>
+                    <option value="Counseling Request">Counseling Request</option>
+                    <option value="Feedback">Feedback</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="message">Message</label>
+                <textarea class="form-textarea" id="message" name="message"
+                          placeholder="How can we help you today?"
+                          rows="6" required></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                    <span class="material-symbols-outlined">send</span>
+                    Send Message
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
-<%-- Include the shared footer with emergency exit button --%>
 <%@ include file="footer.jsp" %>
